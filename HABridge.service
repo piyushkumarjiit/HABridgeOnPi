@@ -1,0 +1,18 @@
+[Unit]
+Description=HA Bridge Service
+Wants=network.target
+After=syslog.target network-online.target
+
+[Service]
+Type=simple
+User=habridgeadmin
+
+WorkingDirectory=/home/userName/ha-bridge
+ExecStart=/usr/bin/java -jar -Dconfig.file=/home/userName/ha-bridge/data/habridge.config /home/userName/ha-bridge/ha-bridge.jar
+
+Restart=on-failure
+RestartSec=10
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
