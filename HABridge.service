@@ -7,8 +7,8 @@ After=syslog.target network-online.target
 Type=simple
 User=habridgeadmin
 
-WorkingDirectory=/home/userName/ha-bridge
-ExecStart=/usr/bin/java -jar -Dconfig.file=/home/userName/ha-bridge/data/habridge.config /home/userName/ha-bridge/ha-bridge.jar
+WorkingDirectory=/etc/habridge
+ExecStart=/usr/bin/java -jar -Dconfig.file=/etc/habridge/data/habridge.config /etc/habridge/ha-bridge.jar
 
 Restart=on-failure
 RestartSec=10
