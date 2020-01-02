@@ -1,10 +1,6 @@
 #!/bin/bash
 #Abort installation if any of the commands fail
 set -e
-#userName=$(whoami)
-#openJDK11Link='https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz'
-#openJDK13ForZeroLink="https://cdn.azul.com/zulu/bin/zulu13.28.11-ca-jdk13.0.1-linux_amd64.deb"
-#haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.3.0/ha-bridge-5.3.0-java11.jar'
 
 #Check if Java is already installed
 java_present=$(java -version > /dev/null 2>&1; echo $?)
@@ -110,41 +106,17 @@ fi
 #Check the status of service
 systemctl status HABridge
 
-#Create the RFOutlet Directory
-if [[ -d "/var/www/rfoutlet" ]]
-then
-	echo "/var/www/rfoutlet Directory exists. Skipping download."
-else
-	#Install wiringpi if not already installed and fetch the project from github
-	wiringpi_present=$(gpio -v > /dev/null 2>&1; echo $?)
-	if [[ $wiringpi_present -le "1" ]]
-	then
-		echo "Installing WiringPi."
-		sudo apt-get install wiringpi
-		echo "WiringPi installed."
-	else
-		echo "WiringPi is present. Continuing without adding."
-	fi
+#Proceed to set up the RF 433
+cd ~
+#Download the service file from github
+wget https://raw.githubusercontent.com/piyushkumarjiit/RFUtilScript/master/RF433Setup.sh
 
-	echo "Downloading RFOutlet source."
-	git clone git://github.com/timleland/rfoutlet.git /var/www/rfoutlet
+#Update the permission
+sudo chmod 755 RF433Setup.sh
+echo "Permission update, calling the script."
+./RF433Setup.sh
+
+#Update HA Bridge Config
+#See if possible to update the config via command line else provide link to the tutorial
 	
-	#sudo mkdir -p /var/www/rfoutlet
-	#Just donwload the binary. In case of issue we will have to download the source and build from it. For now it seems to work on Pi 3 as well as Pi Zero.
-	#sudo wget -O /var/www/rfoutlet/codesend https://github.com/timleland/rfoutlet/raw/master/codesend
-	#RFSNiffer file link to be added
-	
-	echo "Ensure PINs are connected in order GPIO17 | 5V | Ground when the transmitter's non flat side is facing you."
-	#Update the permissions
-	sudo chown root.root /var/www/rfoutlet/codesend
-	sudo chmod 755 /var/www/rfoutlet/codesend
-	echo "Permission updated."
-fi
-
-#To Sniff the RF Code
-#sudo /var/www/rfoutlet/RFSniffer
-
-#To send the RF Code
-#/var/www/rfoutlet/codesend <RFDecimalCode>
-
-echo "Script complete."
+echo "HA Bridge script complete."
