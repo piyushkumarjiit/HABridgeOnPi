@@ -47,6 +47,8 @@ To be updated.
 Once you have executed the script and your Pi has restarted, go to the IP of your Pi in a browser.
 If HA Bridge is working, you should see admin page and be able to update config.
 
+Log can be viewed with <code>tail -f /var/log/syslog</code>
+
 ## Authors
 **Piyush Kumar** - (https://github.com/piyushkumarjiit)
 
