@@ -6,7 +6,7 @@ set -e
 java_present=$(java -version > /dev/null 2>&1; echo $?)
 
 #Check the Model of Pi. There needs to be a different binary and Java for Zero (ARMv6)
-model=$(cat /proc/cpuinfo | grep Model | grep -e "Zero" -e "Model A")
+model=$(echo $(cat /proc/cpuinfo | grep Model | grep -e "Zero" -e "Model A"))
 if [[ -n $model ]]
 then
 	echo "Pi Zero detected. Downloading old HA binary."
