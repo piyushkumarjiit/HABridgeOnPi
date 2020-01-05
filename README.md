@@ -2,7 +2,7 @@
 
 Set up HA Bridge (https://github.com/bwssytems/ha-bridge) for IOT and respective tinkering adventures.
 Objective is to install HA Bridge and other utilities with minimum clicks.
-The script calls another script that installs RFC 433 utilities so that we are able to control Eteckcity RF power outlet form HA Bridge (and eventually via Alexa).
+The script calls another script that installs RFC 433 utilities so that we are able to control Eteckcity (or similar RF433) RF power outlet from HA Bridge (and eventually via Alexa).
 There were issues with version of Java as well as version of HA Bridge. The combination that worked is part of this script.
 
 ## Getting Started
