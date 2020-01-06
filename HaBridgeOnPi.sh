@@ -109,7 +109,9 @@ fi
 #systemctl status HABridge
 echo "Open the Add Device URL"
 #Open the URL to ensure that data folder and config files are created.
-curl "http://192.168.2.125/#\!/editdevice" >> urloutput.txt
+curl "http://192.168.2.125/#\!/editdevice" -o urloutput.txt
+echo "Remove temp file."
+rm urloutput.txt
 
 #Give user option to setup RF433 outlets
 while true; 
