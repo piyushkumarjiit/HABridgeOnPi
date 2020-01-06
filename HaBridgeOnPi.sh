@@ -101,8 +101,6 @@ else
 	#Start the service
 	sudo systemctl start HABridge
 	
-	#Remove files that are no longer used
-	rm ha-bridge.jar
 fi
 
 #Check the status of service
