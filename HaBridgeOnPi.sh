@@ -5,6 +5,9 @@ set -e
 #Check if Java is already installed
 java_present=$(java -version > /dev/null 2>&1; echo $?)
 
+#Check if HA Bridge is already installed
+habridge_present=$(sudo systemctl status HABridge.service > /dev/null 2>&1; echo $?)
+
 #Check the Model of Pi. There needs to be a different binary and Java for Zero (ARMv6)
 model=$(echo $(cat /proc/cpuinfo | grep Model | grep -e "Zero" -e "Model A"))
 if [[ -n $model ]]
@@ -42,11 +45,11 @@ echo "Update complete."
 #In case needed for some testing, you can run HA Bridge via command prompt
 #sudo java -jar -Dserver.port=8080 /etc/habridge/ha-bridge.jar
 
-if [ -f "/etc/systemd/system/HABridge.service" ] 
+if [[ $habridge_present -eq 0 ]]
 then
-    echo "habridge service file exists." 
+    echo "HA Bridge service already installed." 
 else
-    echo "Habridge service file does not exists. Proceeding with installation."
+    echo "Habridge service does not exists. Proceeding with installation."
 	
 	#Create the HA Bridge Directory
 	if [ -d "/etc/habridge" ] 
@@ -79,7 +82,7 @@ else
 	
 	#Link the service file to System directory
 	sudo ln -sf /etc/habridge/HABridge.service /etc/systemd/system/HABridge.service
-	
+	#This user comes handy when running HA BRidge service on Higher ports (and not 80)
 	#Add habridgeadmin User
 	user_exists=$(id -u habridgeadmin > /dev/null 2>&1; echo $?)
 	if [[ $user_exists == "1" ]]
@@ -109,20 +112,6 @@ fi
 #Check the status of service
 systemctl status HABridge
 
-#Proceed to set up the RF 433
-cd ~
-#Download the device.db file from github
-wget https://github.com/piyushkumarjiit/HABridgeOnPi/blob/master/device.db
-#Download the RF433Setup script from github
-wget https://raw.githubusercontent.com/piyushkumarjiit/RFUtilScript/master/RF433Setup.sh
-
-#Update the permission
-sudo chmod 755 RF433Setup.sh
-echo "Permission update, calling the script."
-sudo bash RF433Setup.sh
-
-#Update HA Bridge Config
-#See if possible to update the config via command line else provide link to the tutorial
 #Open the URL to ensure that data folder and config files are created.
 curl http://192.168.2.125/#!/editdevice
 
@@ -134,11 +123,46 @@ else
 	echo "Creating directory."
 	sudo mkdir /etc/habridge/data
 fi
-#Update the device.db with your RFC codes
-sudo mv device.db /etc/habridge/data/
 
-#Restart the HA Bridge service to load the modified file
-sudo systemctl restart HABridge.service
 
+#Give user option to setup RF433 outlets
+while true; 
+do
+read -p "Do you want to proceed with RF Outlet setup? (Yes/No): " user_reply
+case $user_reply in
+	#User is ready to proceed with RF433Setup.sh
+	[Yy]*) echo "Proceeding with RF Setup.";
+	
+	#Proceed to set up the RF 433
+	cd ~
+	#Download the device.db file from github
+	wget https://github.com/piyushkumarjiit/HABridgeOnPi/blob/master/device.db
+	#Download the RF433Setup script from github
+	wget https://raw.githubusercontent.com/piyushkumarjiit/RFUtilScript/master/RF433Setup.sh
+
+	#Update the permission
+	sudo chmod 755 RF433Setup.sh
+	echo "Permission update, calling the script."
+	sudo bash RF433Setup.sh
+
+	#Stop the HA Bridge service
+	sudo systemctl stop HABridge.service
+	#Create backup of old device.db
+	sudo cp etc/habridge/data/device.db etc/habridge/data/device.db.old
+	#Update the device.db with your RFC codes
+	sudo mv device.db /etc/habridge/data/
+	#Reload Daemon to ensure latest changes are used by the service
+	sudo systemctl daemon-reload
+	#Start the HA Bridge service to load the modified file
+	sudo systemctl restart HABridge.service
+	break;;
+	#If user is not ready to proceed with RF Setup
+	[Nn]* ) echo "You can run RF433Setup.sh to set up outlets and manually add to HA Bridge."
+	echo "User skipped the RF Setup"; 
+	sleep 2;
+	break;;
+	* ) echo "Please answer Yes or No.";;
+esac
+done
 	
 echo "HA Bridge script complete."
