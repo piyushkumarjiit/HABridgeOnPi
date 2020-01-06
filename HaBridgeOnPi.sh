@@ -101,6 +101,9 @@ else
 
 	#Start the service
 	sudo systemctl start HABridge
+	
+	#Remove files that are no longer used
+	rm ha-bridge.jar
 fi
 
 #Check the status of service
@@ -108,15 +111,34 @@ systemctl status HABridge
 
 #Proceed to set up the RF 433
 cd ~
-#Download the service file from github
+#Download the device.db file from github
+wget https://github.com/piyushkumarjiit/HABridgeOnPi/blob/master/device.db
+#Download the RF433Setup script from github
 wget https://raw.githubusercontent.com/piyushkumarjiit/RFUtilScript/master/RF433Setup.sh
 
 #Update the permission
 sudo chmod 755 RF433Setup.sh
 echo "Permission update, calling the script."
-./RF433Setup.sh
+sudo bash RF433Setup.sh
 
 #Update HA Bridge Config
 #See if possible to update the config via command line else provide link to the tutorial
+#Open the URL to ensure that data folder and config files are created.
+curl http://192.168.2.125/#!/editdevice
+
+#Create the data directory
+if [[ -d "/etc/habridge/data" ]]
+then
+	echo "Directory exists."
+else
+	echo "Creating directory."
+	sudo mkdir /etc/habridge/data
+fi
+#Update the device.db with your RFC codes
+sudo mv device.db /etc/habridge/data/
+
+#Restart the HA Bridge service to load the modified file
+sudo systemctl restart HABridge.service
+
 	
 echo "HA Bridge script complete."
