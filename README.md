@@ -48,12 +48,15 @@ Codes recorded during script execution are then used to set  up HA Bridge config
 
 <b>For advacned installation options, refer to Custom Installation section. </b>
 
-Once the script completes, you should see "HA Bridge script complete." at the end and system would restart. Once your Pi has restarted, run the script again to capture the RF codes. 
+Once the script completes, you should see "HA Bridge script complete." at the end and system would restart. Once your Pi has restarted, run the script again to capture the RF codes.
 
 ## Testing
 Once you have executed the script go to the IP of your Pi in a browser. If HA Bridge is working, you should see main page along with updated device config.
 
 Log can be viewed with <code>tail -f /var/log/syslog</code>
+
+## Post Installation
+Take necessary steps to ensure security as HA Bridge by default is quite open. If Pi is only being used for running HA Bridge, then router firewall can be updated to stop internet access to this Pi. Read HA Bridge documentation for deploying necessary safety measures.
 
 ## Authors
 **Piyush Kumar** - (https://github.com/piyushkumarjiit)
