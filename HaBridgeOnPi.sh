@@ -20,10 +20,6 @@ else
 	haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.3.0/ha-bridge-5.3.0-java11.jar'
 fi
 
-#Fetch the HA Bridge JAR file
-sudo wget -O ha-bridge.jar $haBridgeLink
-echo "Downloaded HA Bridge JAR file."
-
 if [[ $java_present != 0 ]]
 then
 	#Install OpenJDK
@@ -110,20 +106,10 @@ else
 fi
 
 #Check the status of service
-systemctl status HABridge
-
+#systemctl status HABridge
+echo "Open the Add Device URL"
 #Open the URL to ensure that data folder and config files are created.
-curl http://192.168.2.125/#!/editdevice
-
-#Create the data directory
-if [[ -d "/etc/habridge/data" ]]
-then
-	echo "Directory exists."
-else
-	echo "Creating directory."
-	sudo mkdir /etc/habridge/data
-fi
-
+curl "http://192.168.2.125/#\!/editdevice" >> urloutput.txt
 
 #Give user option to setup RF433 outlets
 while true; 
@@ -132,11 +118,17 @@ read -p "Do you want to proceed with RF Outlet setup? (Yes/No): " user_reply
 case $user_reply in
 	#User is ready to proceed with RF433Setup.sh
 	[Yy]*) echo "Proceeding with RF Setup.";
+	#Create the data directory
+	if [[ -d "/etc/habridge/data" ]]
+	then
+		echo "HA Bridge Directory exists."
+	else
+		echo "Creating HA Bridge directory."
+		sudo mkdir /etc/habridge/data
+	fi
 	
 	#Proceed to set up the RF 433
 	cd ~
-	#Download the device.db file from github
-	wget https://github.com/piyushkumarjiit/HABridgeOnPi/blob/master/device.db
 	#Download the RF433Setup script from github
 	wget https://raw.githubusercontent.com/piyushkumarjiit/RFUtilScript/master/RF433Setup.sh
 
@@ -145,22 +137,61 @@ case $user_reply in
 	echo "Permission update, calling the script."
 	sudo bash RF433Setup.sh
 
-	#Stop the HA Bridge service
-	sudo systemctl stop HABridge.service
-	#Create backup of old device.db
-	sudo cp etc/habridge/data/device.db etc/habridge/data/device.db.old
-	#Update the device.db with your RFC codes
-	sudo mv device.db /etc/habridge/data/
-	#Reload Daemon to ensure latest changes are used by the service
-	sudo systemctl daemon-reload
-	#Start the HA Bridge service to load the modified file
-	sudo systemctl restart HABridge.service
+	#Check if devices.db exists
+	if [[ -f "/etc/habridge/data/device.db" ]]
+	then
+		echo "Device File exists."
+		#Ask user if existing file should be overwritten
+		while :
+		do
+		  read -p "Do you want to overwrite existing devices.db file? (Yes/No): " overwrite_reply
+		  case $overwrite_reply in
+			#Overwrite existing file
+			[Yy]* )
+				echo "Proceeding with overwrite."
+				#Create backup of old device.db
+				sudo cp /etc/habridge/data/device.db /etc/habridge/data/device.db.old
+				#Copy updated the device.db
+				sudo cp device.db /etc/habridge/data/
+				#Stop the HA Bridge service
+				sudo systemctl stop HABridge.service
+				#Reload Daemon to ensure latest changes are used by the service
+				sudo systemctl daemon-reload
+				#Start the HA Bridge service to load the modified file
+				sudo systemctl start HABridge.service
+				echo "Service restarted after reloading."
+				break;;
+				
+			#Do not overwrite existing file	
+			[Nn]* )
+				echo "Existing devices.db file will not be updated. Please manually update HA Bridge config."
+				echo "devices.db file exists and user selected to skip overwrite."
+				break;;
+				
+			* )	echo "Please answer Yes or No.";;
+		  esac
+		done	
+	else
+		echo "Devices.db file not found. Copying updated devices.db file to /etc/habridge/data"
+		#Copy updated devices.db file
+		sudo cp device.db /etc/habridge/data/
+		#Stop the HA Bridge service
+		sudo systemctl stop HABridge.service
+		#Reload Daemon to ensure latest changes are used by the service
+		sudo systemctl daemon-reload
+		#Start the HA Bridge service to load the modified file
+		sudo systemctl start HABridge.service
+		echo "Service restarted after reloading."
+	fi
+
 	break;;
+	
 	#If user is not ready to proceed with RF Setup
 	[Nn]* ) echo "You can run RF433Setup.sh to set up outlets and manually add to HA Bridge."
 	echo "User skipped the RF Setup"; 
 	sleep 2;
 	break;;
+	
 	* ) echo "Please answer Yes or No.";;
 esac
 done
