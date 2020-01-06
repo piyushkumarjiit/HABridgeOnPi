@@ -17,8 +17,14 @@ Connect to your Raspberry Pi via SSH (or directly using Terminal) and follow ins
 
 The script is mostly self contained and fetches necessary files from github repo.
 
+
+If you want to scan and update RF Outlet codes along with HA Bridge installation, please ensure that you have connected the PINs correctly for RF433 transmitter as well as reciever module.
+
+For Reciever: (5V | Empty | GPIO 27 | Ground)
+
+For Transmitter: ( GPIO17 | 5V | Ground )
+
 ### Installing
-#### Simple Installation
 For installation, run below commands from your Pi terminal (or SSH session) :
 
 <code>wget https://raw.githubusercontent.com/piyushkumarjiit/HABridgeOnPi/master/HaBridgeOnPi.sh</code>
@@ -34,7 +40,7 @@ Now run the script:
 The script:
 <li>Downloads and install OpenJDK8</li>
 <li>Downloads and install HA Bridge</li>
-<li>Downloads and executes RF433Setup.sh</li> (checkout that ReadMe on the github page for more details)
+<li>Downloads and executes RF433Setup.sh</li> (checkout https://github.com/piyushkumarjiit/RFUtilScript for more details)
 <li>Provides user way to record his RF remote codes <via RF433Setup.sh)</li>
 
 Pi needs to be restarted before codes can be scanned as WiringPi used to access GPIO is also installed by this script. 
@@ -44,12 +50,8 @@ Codes recorded during script execution are then used to set  up HA Bridge config
 
 Once the script completes, you should see "HA Bridge script complete." at the end and system would restart. Once your Pi has restarted, run the script again to capture the RF codes. 
 
-#### Custom Installation:
-To be updated.
-
 ## Testing
-Once you have executed the script and your Pi has restarted, go to the IP of your Pi in a browser.
-If HA Bridge is working, you should see admin page and be able to update config.
+Once you have executed the script go to the IP of your Pi in a browser. If HA Bridge is working, you should see main page along with updated device config.
 
 Log can be viewed with <code>tail -f /var/log/syslog</code>
 
