@@ -31,14 +31,18 @@ Now run the script:
 
 <code>./HaBridgeOnPi.sh | tee HaBridgeOnPi.log</code>
 
-The script downloads and install OpenJDK8, HA Bridge and provides user to record his RF remote codes.
+The script:
+<li>Downloads and install OpenJDK8</li>
+<li>Downloads and install HA Bridge</li>
+<li>Downloads and executes RF433Setup.sh</li> (checkout that ReadMe on the github page for more details)
+<li>Provides user way to record his RF remote codes <via RF433Setup.sh)</li>
+
 Pi needs to be restarted before codes can be scanned as WiringPi used to access GPIO is also installed by this script. 
 Codes recorded during script execution are then used to set  up HA Bridge config to control the outlets.
 
 <b>For advacned installation options, refer to Custom Installation section. </b>
 
-Once the script completes, you should see "HA Bridge script complete." at the end and system would restart. and your Pi has restarted.
-Run the script again when you are ready to capture the RF codes. 
+Once the script completes, you should see "HA Bridge script complete." at the end and system would restart. Once your Pi has restarted, run the script again to capture the RF codes. 
 
 #### Custom Installation:
 To be updated.
