@@ -105,6 +105,8 @@ fi
 
 #Check the status of service
 #systemctl status HABridge
+#Wait for service to start
+sleep 5
 echo "Open the Add Device URL"
 #Open the URL to ensure that data folder and config files are created.
 curl "http://192.168.2.125/#\!/editdevice" -o urloutput.txt
