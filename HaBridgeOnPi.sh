@@ -135,7 +135,8 @@ case $user_reply in
 	#Update the permission
 	sudo chmod 755 RF433Setup.sh
 	echo "Permission update, calling the script."
-	sudo bash RF433Setup.sh
+	#sudo -i -ubob -sfoo
+	bash RF433Setup.sh
 
 	#Check if devices.db exists
 	if [[ -f "/etc/habridge/data/device.db" ]]
@@ -174,7 +175,8 @@ case $user_reply in
 	else
 		echo "Devices.db file not found. Copying updated devices.db file to /etc/habridge/data"
 		#Copy updated devices.db file
-		sudo cp device.db /etc/habridge/data/
+		sudo cp device.db /etc/habridge/data
+		echo "Updated devices.db copied to /etc/habridge/data"
 		#Stop the HA Bridge service
 		sudo systemctl stop HABridge.service
 		#Reload Daemon to ensure latest changes are used by the service
