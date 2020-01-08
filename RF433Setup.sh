@@ -154,4 +154,4 @@ do
   sleep 1
 done
 
-echo "RF433 related procesing done."
+echo "RF433 related processing done."
