@@ -105,8 +105,10 @@ fi
 
 #Check the status of service
 #systemctl status HABridge
-echo "Waiting for HA Bridge service to start."
-sleep 10
+
+#Wait for service to start
+sleep 5
+
 echo "Open the Add Device URL"
 #Open the URL to ensure that data folder and config files are created.
 curl "http://192.168.2.125/#\!/editdevice" -o urloutput.txt
@@ -200,4 +202,5 @@ case $user_reply in
 esac
 done
 	
-echo "HA Bridge script complete. Wait for 5 minutes then ask Alexa to search for new devices."
+echo "HA Bridge script complete."
+
