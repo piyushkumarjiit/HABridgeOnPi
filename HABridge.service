@@ -5,10 +5,9 @@ After=syslog.target network-online.target
 
 [Service]
 Type=simple
-User=habridgeadmin
 
 WorkingDirectory=/etc/habridge
-ExecStart=/usr/bin/java -jar /etc/habridge/ha-bridge.jar
+ExecStart=sudo /usr/bin/java -jar -Dexec.garden/var/www/rfoutlet /etc/habridge/ha-bridge.jar
 
 Restart=on-failure
 RestartSec=10

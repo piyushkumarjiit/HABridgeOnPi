@@ -1,30 +1,24 @@
 #!/bin/bash
 #Abort installation if any of the commands fail
 set -e
-#userName=$(whoami)
-#openJDK11Link='https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz'
-#openJDK13ForZeroLink="https://cdn.azul.com/zulu/bin/zulu13.28.11-ca-jdk13.0.1-linux_amd64.deb"
-#oracleJDKLink=''
-#haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.3.0/ha-bridge-5.3.0-java11.jar'
 
 #Check if Java is already installed
 java_present=$(java -version > /dev/null 2>&1; echo $?)
 
-#Check the Model of Pi. There needs to be a different binary and Java for Zero (ARMv6)
-	model=$(cat /proc/cpuinfo | grep Model | grep -e "Zero" -e "Model A")
-	if [[ -n $model ]]
-	then
-		echo "Pi Zero detected. Downloading old HA binary."
-		#HA_Version5.2.2 works with OpenJDK_8 while Later versions of HA do not
-		haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.2.2/ha-bridge-5.2.2.jar'	
-	else
-		echo "Not Pi Zero Model. Downloading recent/latest HA binary."
-		haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.3.0/ha-bridge-5.3.0-java11.jar'
-	fi
+#Check if HA Bridge is already installed
+habridge_present=$(sudo systemctl status HABridge.service > /dev/null 2>&1; echo $?)
 
-#Fetch the HA Bridge JAR file
-sudo wget -O ha-bridge.jar $haBridgeLink
-echo "Downloaded HA Bridge JAR file."
+#Check the Model of Pi. There needs to be a different binary and Java for Zero (ARMv6)
+model=$(echo $(cat /proc/cpuinfo | grep Model | grep -e "Zero" -e "Model A"))
+if [[ -n $model ]]
+then
+	echo "Pi Zero detected. Downloading old HA binary."
+	#HA_Version5.2.2 works with OpenJDK_8 while Later versions of HA do not
+	haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.2.2/ha-bridge-5.2.2.jar'	
+else
+	echo "Not Pi Zero Model. Downloading recent/latest HA binary."
+	haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.3.0/ha-bridge-5.3.0-java11.jar'
+fi
 
 if [[ $java_present != 0 ]]
 then
@@ -47,11 +41,11 @@ echo "Update complete."
 #In case needed for some testing, you can run HA Bridge via command prompt
 #sudo java -jar -Dserver.port=8080 /etc/habridge/ha-bridge.jar
 
-if [ -f "/etc/systemd/system/HABridge.service" ] 
+if [[ $habridge_present -eq 0 ]]
 then
-    echo "habridge service file exists." 
+    echo "HA Bridge service already installed." 
 else
-    echo "Habridge service file does not exists. Proceeding with installation."
+    echo "Habridge service does not exists. Proceeding with installation."
 	
 	#Create the HA Bridge Directory
 	if [ -d "/etc/habridge" ] 
@@ -84,7 +78,7 @@ else
 	
 	#Link the service file to System directory
 	sudo ln -sf /etc/habridge/HABridge.service /etc/systemd/system/HABridge.service
-	
+	#This user comes handy when running HA BRidge service on Higher ports (and not 80)
 	#Add habridgeadmin User
 	user_exists=$(id -u habridgeadmin > /dev/null 2>&1; echo $?)
 	if [[ $user_exists == "1" ]]
@@ -106,10 +100,104 @@ else
 
 	#Start the service
 	sudo systemctl start HABridge
+	
 fi
 
-
 #Check the status of service
-systemctl status HABridge
+#systemctl status HABridge
+echo "Waiting for HA Bridge service to start."
+sleep 10
+echo "Open the Add Device URL"
+#Open the URL to ensure that data folder and config files are created.
+curl "http://192.168.2.125/#\!/editdevice" -o urloutput.txt
+echo "Remove temp file."
+rm urloutput.txt
 
-echo "Script complete."
+#Give user option to setup RF433 outlets
+while true; 
+do
+read -p "Do you want to proceed with RF Outlet setup? (Yes/No): " user_reply
+case $user_reply in
+	#User is ready to proceed with RF433Setup.sh
+	[Yy]*) echo "Proceeding with RF Setup.";
+	#Create the data directory
+	if [[ -d "/etc/habridge/data" ]]
+	then
+		echo "HA Bridge Directory exists."
+	else
+		echo "Creating HA Bridge directory."
+		sudo mkdir /etc/habridge/data
+	fi
+	
+	#Proceed to set up the RF 433
+	cd ~
+	#Download the RF433Setup script from github
+	wget https://raw.githubusercontent.com/piyushkumarjiit/RFUtilScript/master/RF433Setup.sh
+
+	#Update the permission
+	sudo chmod 755 RF433Setup.sh
+	echo "Permission update, calling the script."
+	#sudo -i -ubob -sfoo
+	bash RF433Setup.sh
+
+	#Check if devices.db exists
+	if [[ -f "/etc/habridge/data/device.db" ]]
+	then
+		echo "Device File exists."
+		#Ask user if existing file should be overwritten
+		while :
+		do
+		  read -p "Do you want to overwrite existing devices.db file? (Yes/No): " overwrite_reply
+		  case $overwrite_reply in
+			#Overwrite existing file
+			[Yy]* )
+				echo "Proceeding with overwrite."
+				#Create backup of old device.db
+				sudo cp /etc/habridge/data/device.db /etc/habridge/data/device.db.old
+				#Copy updated the device.db
+				sudo cp device.db /etc/habridge/data/
+				#Stop the HA Bridge service
+				sudo systemctl stop HABridge.service
+				#Reload Daemon to ensure latest changes are used by the service
+				sudo systemctl daemon-reload
+				#Start the HA Bridge service to load the modified file
+				sudo systemctl start HABridge.service
+				echo "Service restarted after reloading."
+				break;;
+				
+			#Do not overwrite existing file	
+			[Nn]* )
+				echo "Existing devices.db file will not be updated. Please manually update HA Bridge config."
+				echo "devices.db file exists and user selected to skip overwrite."
+				break;;
+				
+			* )	echo "Please answer Yes or No.";;
+		  esac
+		done	
+	else
+		echo "Devices.db file not found. Copying updated devices.db file to /etc/habridge/data"
+		#Copy updated devices.db file
+		sudo cp device.db /etc/habridge/data
+		echo "Updated devices.db copied to /etc/habridge/data"
+		#Stop the HA Bridge service
+		sudo systemctl stop HABridge.service
+		#Reload Daemon to ensure latest changes are used by the service
+		sudo systemctl daemon-reload
+		#Start the HA Bridge service to load the modified file
+		sudo systemctl start HABridge.service
+		echo "Service restarted after reloading."
+	fi
+
+	break;;
+	
+	#If user is not ready to proceed with RF Setup
+	[Nn]* ) echo "You can run RF433Setup.sh to set up outlets and manually add to HA Bridge."
+	echo "User skipped the RF Setup"; 
+	sleep 2;
+	break;;
+	
+	* ) echo "Please answer Yes or No.";;
+esac
+done
+	
+echo "HA Bridge script complete. Wait for 5 minutes then ask Alexa to search for new devices."
