@@ -46,7 +46,7 @@ Now run the script:
 The script:
 <li>Downloads and install OpenJDK8</li>
 <li>Downloads and install HA Bridge</li>
-<li>Downloads and executes RF433Setup.sh</li> (checkout https://github.com/piyushkumarjiit/RFUtilScript for more details)
+<li>Downloads and executes RF433Setup.sh</li> (Checkout <a href="https://github.com/piyushkumarjiit/RFUtilScript">original project</a> for more details)
 <li>Provides user way to record his RF remote codes <via RF433Setup.sh)</li>
 
 Pi needs to be restarted before codes can be scanned as WiringPi used to access GPIO is also installed by this script. 
