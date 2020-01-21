@@ -28,7 +28,7 @@ For Reciever: (5V | Empty | GPIO 27 | Ground)
 
 For Transmitter: ( GPIO17 | 5V | Ground )
 
-Note: For my RF plug set up, I used this one: https://www.amazon.com/gp/product/B00M2CUALS to control to contorl these: https://www.amazon.com/Etekcity-Household-Appliances-Unlimited-Connections/dp/B00DQELHBS
+Note: For my RF controlled plug set up, I used  <a href="https://www.amazon.com/gp/product/B00M2CUALS">this tarnsmitter/reciever combo</a> to control <a href="https://www.amazon.com/Etekcity-Household-Appliances-Unlimited-Connections/dp/B00DQELHBS">these.</a>
 
 ### Installing
 For installation, run below commands from your Pi terminal (or SSH session) :
