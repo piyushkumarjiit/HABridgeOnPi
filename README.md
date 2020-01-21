@@ -16,8 +16,8 @@ Connect to your Raspberry Pi via SSH (or directly using Terminal) and follow ins
 <li>Access to Internet</li>
 
 #### Optional Hardware
-<li>RF Transmitter + Reciever (https://www.amazon.com/gp/product/B00M2CUALS)</li>
-<li>RF Plugs + Remote (https://www.amazon.com/Etekcity-Household-Appliances-Unlimited-Connections/dp/B00DQELHBS)</li>
+<li> <a href="https://www.amazon.com/gp/product/B00M2CUALS">RF Transmitter + Reciever</a></li>
+<li> <a href="https://www.amazon.com/Etekcity-Household-Appliances-Unlimited-Connections/dp/B00DQELHBS">RF Plugs + Remote</a></li>
 <br/>
 The script is mostly self contained and fetches necessary files from github repo.
 
