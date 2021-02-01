@@ -2,6 +2,9 @@
 #Abort installation if any of the commands fail
 set -e
 
+#IP Address of current machine
+DEVICE_HOST=$(hostname -I | cut -d" " -f 1)
+
 #Check if Java is already installed
 java_present=$(java -version > /dev/null 2>&1; echo $?)
 
@@ -112,7 +115,7 @@ sleep 10
 
 echo "Open the Add Device URL"
 #Open the URL to ensure that data folder and config files are created.
-curl "http://192.168.2.125/#\!/editdevice" -o urloutput.txt
+curl "http://$DEVICE_HOST/#\!/editdevice" -o urloutput.txt
 echo "Remove temp file."
 rm urloutput.txt
 
