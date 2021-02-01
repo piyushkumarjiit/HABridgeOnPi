@@ -26,7 +26,8 @@ fi
 if [[ $java_present != 0 ]]
 then
 	#Install OpenJDK
-	sudo apt-get install -y openjdk-8-jdk
+	#sudo apt-get install -y openjdk-8-jdk
+	sudo apt-get install -y default-jdk
 
 	#Update the alternatives for Java	
 	sudo update-alternatives --config javac
