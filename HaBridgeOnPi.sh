@@ -146,6 +146,8 @@ case $user_reply in
 	echo "Permission update, calling the script."
 	#sudo -i -ubob -sfoo
 	bash RF433Setup.sh
+	echo "RF433 setup complete."
+	rm RF433Setup.sh
 
 	#Check if devices.db exists
 	if [[ -f "/etc/habridge/data/device.db" ]]
@@ -169,6 +171,7 @@ case $user_reply in
 				sudo systemctl daemon-reload
 				#Start the HA Bridge service to load the modified file
 				sudo systemctl start HABridge.service
+				rm device.db
 				echo "Service restarted after reloading."
 				break;;
 				
@@ -192,6 +195,7 @@ case $user_reply in
 		sudo systemctl daemon-reload
 		#Start the HA Bridge service to load the modified file
 		sudo systemctl start HABridge.service
+		rm device.db
 		echo "Service restarted after reloading."
 	fi
 
