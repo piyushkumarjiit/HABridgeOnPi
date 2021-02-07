@@ -41,7 +41,7 @@ Update the permissions on the downloaded file using:
 
 Now run the script:
 
-<code>./HaBridgeOnPi.sh | tee HaBridgeOnPi.log</code>
+<code>./HaBridgeOnPi.sh |& tee HaBridgeOnPi.log</code>
 
 The script:
 <li>Downloads and install OpenJDK8</li>
