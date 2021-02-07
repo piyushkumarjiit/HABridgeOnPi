@@ -1,0 +1,11 @@
+Codes captured on:  2020-01-07 04:58:12
+On code for button 1 :  1332531
+Off code for button 1 :  1332540
+On code for button 2 :  1332675
+Off code for button 2 :  1332684
+On code for button 3 :  1332995
+Off code for button 3 :  1333004
+On code for button 4 :  1334531
+Off code for button 4 :  1334540
+On code for button 5 :  1340675
+Off code for button 5 :  1340684
