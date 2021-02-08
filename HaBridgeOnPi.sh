@@ -17,7 +17,8 @@ if [[ -n $model ]]
 then
 	echo "Pi Zero detected. Downloading old HA binary."
 	#HA_Version5.2.2 works with OpenJDK_8 while Later versions of HA do not
-	haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.2.2/ha-bridge-5.2.2.jar'	
+	#haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.2.2/ha-bridge-5.2.2.jar'
+	haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.4.0/ha-bridge-5.4.0.jar'
 else
 	echo "Not Pi Zero Model. Downloading recent/latest HA binary."
 	haBridgeLink='https://github.com/bwssytems/ha-bridge/releases/download/v5.3.0/ha-bridge-5.3.0-java11.jar'
@@ -26,8 +27,8 @@ fi
 if [[ $java_present != 0 ]]
 then
 	#Install OpenJDK
-	#sudo apt-get install -y openjdk-8-jdk
-	sudo apt-get install -y default-jdk
+	sudo apt-get install -y openjdk-8-jdk
+	#sudo apt-get install -y default-jdk
 
 	#Update the alternatives for Java	
 	sudo update-alternatives --config javac
